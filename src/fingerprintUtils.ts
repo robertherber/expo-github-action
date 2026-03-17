@@ -104,26 +104,25 @@ export async function getBuildInfoWithFingerprintAsync({
 }): Promise<BuildInfo | null> {
   let builds: BuildInfo[];
   try {
-    const { stdout } = await getExecOutput(
-      await which('eas', true),
-      [
-        'build:list',
-        '--platform',
-        platform,
-        '--buildProfile',
-        profile,
-        '--fingerprint-hash',
-        fingerprintHash,
-        '--limit',
-        '1',
-        '--json',
-        '--non-interactive',
-      ],
-      {
-        cwd,
-        silent: !isDebug(),
-      }
-    );
+    const args = [
+      'build:list',
+      '--platform',
+      platform,
+      '--buildProfile',
+      profile,
+      '--fingerprint-hash',
+      fingerprintHash,
+      '--limit',
+      '1',
+      '--json',
+      '--non-interactive',
+    ];
+    console.log(`Running command: eas ${args.join(' ')}`);
+    const { stdout } = await getExecOutput(await which('eas', true), args, {
+      cwd,
+      silent: !isDebug(),
+    });
+    console.log('stdout', JSON.stringify(stdout, null, 2));
     builds = JSON.parse(stdout);
   } catch (error: unknown) {
     throw new Error(`Error getting EAS builds: ${String(error)}`, { cause: error });

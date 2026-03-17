@@ -35219,22 +35219,25 @@ async function getFingerprintHashForPlatformAsync({ cwd, platform, environment, 
 async function getBuildInfoWithFingerprintAsync({ cwd, platform, profile, fingerprintHash, excludeExpiredBuilds, }) {
     let builds;
     try {
-        const { stdout } = await (0, exec_1.getExecOutput)(await (0, io_1.which)('eas', true), [
-            'build:list',
-            '--platform',
-            platform,
-            '--buildProfile',
-            profile,
-            '--fingerprint-hash',
-            fingerprintHash,
-            '--limit',
-            '1',
-            '--json',
-            '--non-interactive',
-        ], {
+      const args = [
+                  'build:list',
+                  '--platform',
+                  platform,
+                  '--buildProfile',
+                  profile,
+                  '--fingerprint-hash',
+                  fingerprintHash,
+                  '--limit',
+                  '1',
+                  '--json',
+                  '--non-interactive',
+              ]
+              console.log(`Running command: eas ${args.join(' ')}`);
+        const { stdout } = await (0, exec_1.getExecOutput)(await (0, io_1.which)('eas', true), args, {
             cwd,
             silent: !(0, core_1.isDebug)(),
         });
+        console.log('stdout', JSON.stringify(stdout, null, 2))
         builds = JSON.parse(stdout);
     }
     catch (error) {
