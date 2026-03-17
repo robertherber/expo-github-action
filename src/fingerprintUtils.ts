@@ -112,7 +112,7 @@ export async function getBuildInfoWithFingerprintAsync({
         platform,
         '--buildProfile',
         profile,
-        '--runtimeVersion',
+        '--fingerprint-hash',
         fingerprintHash,
         '--limit',
         '1',

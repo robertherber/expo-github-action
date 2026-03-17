@@ -35225,7 +35225,7 @@ async function getBuildInfoWithFingerprintAsync({ cwd, platform, profile, finger
             platform,
             '--buildProfile',
             profile,
-            '--runtimeVersion',
+            '--fingerprint-hash',
             fingerprintHash,
             '--limit',
             '1',
