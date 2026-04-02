@@ -35460,6 +35460,19 @@ const core_1 = __nccwpck_require__(7484);
 const exec_1 = __nccwpck_require__(5236);
 const io_1 = __nccwpck_require__(4994);
 /**
+ * Resolve the package runner to use for executing expo commands.
+ * Prefers `bunx` if available (works better with bun-managed projects),
+ * falls back to `npx`.
+ */
+async function resolvePackageRunner() {
+    try {
+        return await (0, io_1.which)('bunx', true);
+    }
+    catch {
+        return 'npx';
+    }
+}
+/**
  * Load the Expo app project config in the given directory.
  * This runs `expo config` command instead of using `@expo/config` directly,
  * to use the app's own version of the config.
@@ -35471,11 +35484,12 @@ async function loadProjectConfig(cwd, easEnvironment) {
     let args;
     if (easEnvironment) {
         commandLine = await (0, io_1.which)('eas', true);
-        const commandToExecute = ['npx', ...baseArguments].join(' ').replace(/"/g, '\\"');
+        const runner = await resolvePackageRunner();
+        const commandToExecute = [runner, ...baseArguments].join(' ').replace(/"/g, '\\"');
         args = ['env:exec', '--non-interactive', easEnvironment, `"${commandToExecute}"`];
     }
     else {
-        commandLine = 'npx';
+        commandLine = await resolvePackageRunner();
         args = baseArguments;
     }
     (0, core_1.info)(`[loadProjectConfig] Running: ${commandLine} ${args.join(' ')}`);

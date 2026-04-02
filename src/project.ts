@@ -4,6 +4,19 @@ import { which } from '@actions/io';
 import { ExpoConfig } from '@expo/config';
 
 /**
+ * Resolve the package runner to use for executing expo commands.
+ * Prefers `bunx` if available (works better with bun-managed projects),
+ * falls back to `npx`.
+ */
+async function resolvePackageRunner(): Promise<string> {
+  try {
+    return await which('bunx', true);
+  } catch {
+    return 'npx';
+  }
+}
+
+/**
  * Load the Expo app project config in the given directory.
  * This runs `expo config` command instead of using `@expo/config` directly,
  * to use the app's own version of the config.
@@ -20,10 +33,11 @@ export async function loadProjectConfig(
   let args: string[];
   if (easEnvironment) {
     commandLine = await which('eas', true);
-    const commandToExecute = ['npx', ...baseArguments].join(' ').replace(/"/g, '\\"');
+    const runner = await resolvePackageRunner();
+    const commandToExecute = [runner, ...baseArguments].join(' ').replace(/"/g, '\\"');
     args = ['env:exec', '--non-interactive', easEnvironment, `"${commandToExecute}"`];
   } else {
-    commandLine = 'npx';
+    commandLine = await resolvePackageRunner();
     args = baseArguments;
   }
 
