@@ -1,4 +1,4 @@
-import { info, warning, isDebug } from '@actions/core';
+import { isDebug } from '@actions/core';
 import { getExecOutput } from '@actions/exec';
 import { which } from '@actions/io';
 import { ExpoConfig } from '@expo/config';
@@ -41,27 +41,12 @@ export async function loadProjectConfig(
     args = baseArguments;
   }
 
-  info(`[loadProjectConfig] Running: ${commandLine} ${args.join(' ')}`);
-  info(`[loadProjectConfig] cwd: ${cwd}`);
-
   try {
-    const result = await getExecOutput(commandLine, args, {
+    ({ stdout } = await getExecOutput(commandLine, args, {
       cwd,
       silent: !isDebug(),
-    });
-    stdout = result.stdout;
-    if (result.stderr) {
-      warning(`[loadProjectConfig] stderr: ${result.stderr}`);
-    }
-    info(`[loadProjectConfig] exitCode: ${result.exitCode}`);
+    }));
   } catch (error: unknown) {
-    warning(`[loadProjectConfig] Command failed. Error: ${error instanceof Error ? error.message : String(error)}`);
-    if (error instanceof Error && 'stdout' in error) {
-      warning(`[loadProjectConfig] stdout from error: ${(error as any).stdout}`);
-    }
-    if (error instanceof Error && 'stderr' in error) {
-      warning(`[loadProjectConfig] stderr from error: ${(error as any).stderr}`);
-    }
     throw new Error(`Could not fetch the project info from ${cwd}`, { cause: error });
   }
 

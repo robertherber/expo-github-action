@@ -35568,27 +35568,13 @@ async function loadProjectConfig(cwd, easEnvironment) {
         commandLine = await resolvePackageRunner();
         args = baseArguments;
     }
-    (0, core_1.info)(`[loadProjectConfig] Running: ${commandLine} ${args.join(' ')}`);
-    (0, core_1.info)(`[loadProjectConfig] cwd: ${cwd}`);
     try {
-        const result = await (0, exec_1.getExecOutput)(commandLine, args, {
+        ({ stdout } = await (0, exec_1.getExecOutput)(commandLine, args, {
             cwd,
             silent: !(0, core_1.isDebug)(),
-        });
-        stdout = result.stdout;
-        if (result.stderr) {
-            (0, core_1.warning)(`[loadProjectConfig] stderr: ${result.stderr}`);
-        }
-        (0, core_1.info)(`[loadProjectConfig] exitCode: ${result.exitCode}`);
+        }));
     }
     catch (error) {
-        (0, core_1.warning)(`[loadProjectConfig] Command failed. Error: ${error instanceof Error ? error.message : String(error)}`);
-        if (error instanceof Error && 'stdout' in error) {
-            (0, core_1.warning)(`[loadProjectConfig] stdout from error: ${error.stdout}`);
-        }
-        if (error instanceof Error && 'stderr' in error) {
-            (0, core_1.warning)(`[loadProjectConfig] stderr from error: ${error.stderr}`);
-        }
         throw new Error(`Could not fetch the project info from ${cwd}`, { cause: error });
     }
     return JSON.parse(stdout);
