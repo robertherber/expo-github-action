@@ -3,18 +3,7 @@ import { getExecOutput } from '@actions/exec';
 import { which } from '@actions/io';
 import { ExpoConfig } from '@expo/config';
 
-/**
- * Resolve the package runner to use for executing expo commands.
- * Prefers `bunx` if available (works better with bun-managed projects),
- * falls back to `npx`.
- */
-async function resolvePackageRunner(): Promise<string> {
-  try {
-    return await which('bunx', true);
-  } catch {
-    return 'npx';
-  }
-}
+import { resolvePackageRunner } from './packageRunner';
 
 /**
  * Load the Expo app project config in the given directory.

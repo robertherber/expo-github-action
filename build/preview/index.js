@@ -35525,15 +35525,13 @@ async function getPullRequestFromGitCommitShaAsync(options, gitCommitHash) {
 
 /***/ }),
 
-/***/ 4330:
+/***/ 7253:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.loadProjectConfig = loadProjectConfig;
-const core_1 = __nccwpck_require__(7484);
-const exec_1 = __nccwpck_require__(5236);
+exports.resolvePackageRunner = resolvePackageRunner;
 const io_1 = __nccwpck_require__(4994);
 /**
  * Resolve the package runner to use for executing expo commands.
@@ -35548,6 +35546,21 @@ async function resolvePackageRunner() {
         return 'npx';
     }
 }
+
+
+/***/ }),
+
+/***/ 4330:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.loadProjectConfig = loadProjectConfig;
+const core_1 = __nccwpck_require__(7484);
+const exec_1 = __nccwpck_require__(5236);
+const io_1 = __nccwpck_require__(4994);
+const packageRunner_1 = __nccwpck_require__(7253);
 /**
  * Load the Expo app project config in the given directory.
  * This runs `expo config` command instead of using `@expo/config` directly,
@@ -35560,12 +35573,12 @@ async function loadProjectConfig(cwd, easEnvironment) {
     let args;
     if (easEnvironment) {
         commandLine = await (0, io_1.which)('eas', true);
-        const runner = await resolvePackageRunner();
+        const runner = await (0, packageRunner_1.resolvePackageRunner)();
         const commandToExecute = [runner, ...baseArguments].join(' ').replace(/"/g, '\\"');
         args = ['env:exec', '--non-interactive', easEnvironment, `"${commandToExecute}"`];
     }
     else {
-        commandLine = await resolvePackageRunner();
+        commandLine = await (0, packageRunner_1.resolvePackageRunner)();
         args = baseArguments;
     }
     try {

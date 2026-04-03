@@ -3,6 +3,7 @@ import { getExecOutput } from '@actions/exec';
 import { which } from '@actions/io';
 
 import { BuildInfo, BuildStatus } from './expo';
+import { resolvePackageRunner } from './packageRunner';
 
 export async function getBuildInfoForCurrentFingerprintAsync({
   platform,
@@ -68,10 +69,11 @@ async function getFingerprintHashForPlatformAsync({
     let args: string[];
     if (environment) {
       commandLine = await which('eas', true);
-      const commandToExecute = ['npx', ...baseArguments].join(' ').replace(/"/g, '\\"');
+      const runner = await resolvePackageRunner();
+      const commandToExecute = [runner, ...baseArguments].join(' ').replace(/"/g, '\\"');
       args = ['env:exec', '--non-interactive', environment, `"${commandToExecute}"`];
     } else {
-      commandLine = 'npx';
+      commandLine = await resolvePackageRunner();
       args = baseArguments;
     }
 
